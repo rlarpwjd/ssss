@@ -1,40 +1,1300 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나의 첫 웹사이트</title>
+
+    <title>Simple Rhythm Chart Editor</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
+            background: #181818;
+            color: white;
+        }
+
+        header {
+            padding: 20px;
             text-align: center;
-            background-color: #f5f5f5;
-            padding: 50px;
+            background: #252525;
         }
 
-        h1 {
-            color: #333;
+        header h1 {
+            margin: 0 0 10px;
         }
 
-        p {
-            color: #666;
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 15px;
+            background: #202020;
+        }
+
+        button,
+        input {
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 16px;
             cursor: pointer;
+            background: #444;
+            color: white;
+        }
+
+        button:hover {
+            background: #666;
+        }
+
+        .main {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        #timeInfo {
+            text-align: center;
+            font-size: 20px;
+            margin: 15px;
+        }
+
+        /* 채보 에디터 */
+        #editor {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #111;
+            border: 2px solid #555;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        #timeline {
+            position: relative;
+            height: 100%;
+            min-width: 2000px;
+        }
+
+        /* 시간 눈금 */
+        .time-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #444;
+        }
+
+        .time-label {
+            position: absolute;
+            top: 5px;
+            font-size: 12px;
+            color: #aaa;
+            transform: translateX(-50%);
+        }
+
+        /* 레인 */
+        .lane {
+            position: absolute;
+            top: 50px;
+            bottom: 0;
+            width: 20%;
+            border-left: 1px solid #444;
+            border-right: 1px solid #444;
+            cursor: crosshair;
+        }
+
+        .lane:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .lane-label {
+            position: absolute;
+            top: -35px;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 노트 */
+        .note {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: #ff4f81;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            border: 3px solid white;
+            z-index: 10;
+        }
+
+        .note:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .note.selected {
+            background: #00d9ff;
+            box-shadow: 0 0 15px #00d9ff;
+        }
+
+        /* 플레이 테스트 */
+        #gameArea {
+            display: none;
+            position: relative;
+            width: 500px;
+            height: 600px;
+            margin: 30px auto;
+            background: #111;
+            border: 2px solid #555;
+            overflow: hidden;
+        }
+
+        .game-lane {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20%;
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+        }
+
+        .hit-line {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            height: 5px;
+            background: white;
+        }
+
+        .game-note {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #ff4f81;
+            border: 3px solid white;
+            transform: translateX(-50%);
+        }
+
+        .key-guide {
+            text-align: center;
+            margin-top: 10px;
+            color: #aaa;
+        }
+
+        .status {
+            text-align: center;
+            margin: 10px;
+            color: #00d9ff;
         }
     </style>
 </head>
 
 <body>
-    <h1>안녕하세요!</h1>
-    <p>제가 만든 첫 번째 웹사이트입니다.</p>
 
-    <button onclick="alert('버튼을 눌렀어요!')">
-        눌러보기
+<header>
+    <h1>🎵 Simple Rhythm Chart Editor</h1>
+    <p>웹에서 간단하게 채보를 만들어보세요.</p>
+</header>
+
+<div class="controls">
+
+    <input
+        type="file"
+        id="audioFile"
+        accept="audio/*"
+    >
+
+    <button id="playBtn">
+        ▶ 재생
     </button>
+
+    <button id="stopBtn">
+        ■ 정지
+    </button>
+
+    <button id="deleteBtn">
+        🗑 선택 노트 삭제
+    </button>
+
+    <button id="clearBtn">
+        ✕ 전체 삭제
+    </button>
+
+    <button id="saveBtn">
+        💾 채보 저장
+    </button>
+
+    <input
+        type="file"
+        id="loadFile"
+        accept=".json"
+    >
+
+    <button id="testBtn">
+        🎮 플레이 테스트
+    </button>
+
+</div>
+
+<div class="main">
+
+    <div id="timeInfo">
+        현재 시간: <span id="currentTime">0.00</span>초
+    </div>
+
+    <div class="status" id="status">
+        음악 파일을 업로드해주세요.
+    </div>
+
+    <div id="editor">
+        <div id="timeline"></div>
+    </div>
+
+    <div class="key-guide">
+        채보 추가: 원하는 레인을 클릭하세요.
+        <br>
+        플레이 테스트: D / F / J / K / L
+    </div>
+
+    <audio id="audio"></audio>
+
+    <div id="gameArea">
+
+        <div class="game-lane" style="left: 0%;"></div>
+        <div class="game-lane" style="left: 20%;"></div>
+        <div class="game-lane" style="left: 40%;"></div>
+        <div class="game-lane" style="left: 60%;"></div>
+        <div class="game-lane" style="left: 80%;"></div>
+
+        <div class="hit-line"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+        ==============================
+        기본 변수
+        ==============================
+    */
+
+    const audio = document.getElementById("audio");
+
+    const audioFile = document.getElementById("audioFile");
+
+    const playBtn = document.getElementById("playBtn");
+
+    const stopBtn = document.getElementById("stopBtn");
+
+    const deleteBtn = document.getElementById("deleteBtn");
+
+    const clearBtn = document.getElementById("clearBtn");
+
+    const saveBtn = document.getElementById("saveBtn");
+
+    const loadFile = document.getElementById("loadFile");
+
+    const testBtn = document.getElementById("testBtn");
+
+    const editor = document.getElementById("editor");
+
+    const timeline = document.getElementById("timeline");
+
+    const currentTimeText =
+        document.getElementById("currentTime");
+
+    const status =
+        document.getElementById("status");
+
+    const gameArea =
+        document.getElementById("gameArea");
+
+
+    /*
+        채보 데이터
+
+        예:
+
+        {
+            time: 1.5,
+            lane: 2,
+            type: "normal"
+        }
+    */
+
+    let notes = [];
+
+    let selectedNote = null;
+
+    let audioDuration = 60;
+
+    let objectURL = null;
+
+    let isPlayingTest = false;
+
+    let gameNotes = [];
+
+
+    /*
+        ==============================
+        음악 파일 업로드
+        ==============================
+    */
+
+    audioFile.addEventListener("change", function(event) {
+
+        const file = event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (objectURL) {
+            URL.revokeObjectURL(objectURL);
+        }
+
+        objectURL = URL.createObjectURL(file);
+
+        audio.src = objectURL;
+
+        audio.addEventListener(
+            "loadedmetadata",
+            function() {
+
+                audioDuration = audio.duration;
+
+                status.textContent =
+                    "음악 로드 완료! 원하는 위치의 레인을 클릭해 노트를 추가하세요.";
+
+                createTimeline();
+
+            },
+            { once: true }
+        );
+
+    });
+
+
+    /*
+        ==============================
+        타임라인 생성
+        ==============================
+    */
+
+    function createTimeline() {
+
+        timeline.innerHTML = "";
+
+        const pixelsPerSecond = 100;
+
+        timeline.style.width =
+            Math.max(
+                2000,
+                audioDuration * pixelsPerSecond
+            ) + "px";
+
+
+        /*
+            시간 눈금
+        */
+
+        for (
+            let second = 0;
+            second <= audioDuration;
+            second++
+        ) {
+
+            const line =
+                document.createElement("div");
+
+            line.className = "time-line";
+
+            line.style.left =
+                (second * pixelsPerSecond) + "px";
+
+            const label =
+                document.createElement("div");
+
+            label.className = "time-label";
+
+            label.textContent =
+                second + "s";
+
+            label.style.left =
+                (second * pixelsPerSecond) + "px";
+
+            timeline.appendChild(line);
+
+            timeline.appendChild(label);
+
+        }
+
+
+        /*
+            5개의 레인
+        */
+
+        for (
+            let i = 0;
+            i < 5;
+            i++
+        ) {
+
+            const lane =
+                document.createElement("div");
+
+            lane.className = "lane";
+
+            lane.style.left =
+                (i * 20) + "%";
+
+            const label =
+                document.createElement("div");
+
+            label.className = "lane-label";
+
+            label.textContent =
+                "Lane " + (i + 1);
+
+            lane.appendChild(label);
+
+
+            /*
+                레인 클릭
+            */
+
+            lane.addEventListener(
+                "click",
+                function(event) {
+
+                    /*
+                        노트를 클릭한 경우
+                        레인 클릭으로 처리하지 않음
+                    */
+
+                    if (
+                        event.target.classList.contains(
+                            "note"
+                        )
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                        클릭한 위치 계산
+                    */
+
+                    const rect =
+                        lane.getBoundingClientRect();
+
+                    const clickX =
+                        event.clientX - rect.left;
+
+                    const time =
+                        audio.currentTime +
+                        clickX / 100;
+
+
+                    /*
+                        노트 추가
+                    */
+
+                    addNote(
+                        time,
+                        i
+                    );
+
+                }
+            );
+
+            timeline.appendChild(lane);
+
+        }
+
+        renderNotes();
+
+    }
+
+
+    /*
+        ==============================
+        노트 추가
+        ==============================
+    */
+
+    function addNote(
+        time,
+        lane
+    ) {
+
+        if (
+            time < 0 ||
+            time > audioDuration
+        ) {
+            return;
+        }
+
+        const note = {
+
+            id:
+                Date.now() +
+                Math.random(),
+
+            time:
+                Number(time.toFixed(3)),
+
+            lane:
+                lane,
+
+            type:
+                "normal"
+
+        };
+
+        notes.push(note);
+
+        notes.sort(
+            (a, b) =>
+                a.time - b.time
+        );
+
+        renderNotes();
+
+    }
+
+
+    /*
+        ==============================
+        노트 화면에 표시
+        ==============================
+    */
+
+    function renderNotes() {
+
+        /*
+            기존 노트 제거
+        */
+
+        document
+            .querySelectorAll(".note")
+            .forEach(
+                element =>
+                    element.remove()
+            );
+
+
+        const pixelsPerSecond = 100;
+
+
+        notes.forEach(
+            function(note) {
+
+                const noteElement =
+                    document.createElement("div");
+
+                noteElement.className =
+                    "note";
+
+
+                /*
+                    시간에 따른 X 위치
+                */
+
+                noteElement.style.left =
+                    (
+                        note.time *
+                        pixelsPerSecond
+                    ) + "px";
+
+
+                /*
+                    레인에 따른 Y 위치
+                */
+
+                noteElement.style.top =
+                    (
+                        100 +
+                        note.lane *
+                        60
+                    ) + "px";
+
+
+                /*
+                    노트 선택
+                */
+
+                if (
+                    selectedNote &&
+                    selectedNote.id === note.id
+                ) {
+
+                    noteElement.classList.add(
+                        "selected"
+                    );
+
+                }
+
+
+                /*
+                    클릭 이벤트
+                */
+
+                noteElement.addEventListener(
+                    "click",
+                    function(event) {
+
+                        event.stopPropagation();
+
+                        selectedNote =
+                            note;
+
+                        renderNotes();
+
+                    }
+                );
+
+
+                timeline.appendChild(
+                    noteElement
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+        ==============================
+        음악 재생
+        ==============================
+    */
+
+    playBtn.addEventListener(
+        "click",
+        function() {
+
+            if (!audio.src) {
+
+                alert(
+                    "먼저 음악 파일을 업로드하세요."
+                );
+
+                return;
+
+            }
+
+            audio.play();
+
+        }
+    );
+
+
+    /*
+        ==============================
+        음악 정지
+        ==============================
+    */
+
+    stopBtn.addEventListener(
+        "click",
+        function() {
+
+            audio.pause();
+
+            audio.currentTime = 0;
+
+        }
+    );
+
+
+    /*
+        ==============================
+        현재 시간 표시
+        ==============================
+    */
+
+    audio.addEventListener(
+        "timeupdate",
+        function() {
+
+            currentTimeText.textContent =
+                audio.currentTime.toFixed(2);
+
+        }
+    );
+
+
+    /*
+        ==============================
+        선택한 노트 삭제
+        ==============================
+    */
+
+    deleteBtn.addEventListener(
+        "click",
+        function() {
+
+            if (!selectedNote) {
+
+                alert(
+                    "삭제할 노트를 선택하세요."
+                );
+
+                return;
+
+            }
+
+            notes =
+                notes.filter(
+                    note =>
+                        note.id !==
+                        selectedNote.id
+                );
+
+            selectedNote = null;
+
+            renderNotes();
+
+        }
+    );
+
+
+    /*
+        ==============================
+        전체 노트 삭제
+        ==============================
+    */
+
+    clearBtn.addEventListener(
+        "click",
+        function() {
+
+            if (
+                !confirm(
+                    "모든 채보를 삭제할까요?"
+                )
+            ) {
+                return;
+            }
+
+            notes = [];
+
+            selectedNote = null;
+
+            renderNotes();
+
+        }
+    );
+
+
+    /*
+        ==============================
+        JSON 저장
+        ==============================
+    */
+
+    saveBtn.addEventListener(
+        "click",
+        function() {
+
+            const chartData = {
+
+                title:
+                    "My Rhythm Chart",
+
+                duration:
+                    audioDuration,
+
+                notes:
+                    notes
+
+            };
+
+
+            const json =
+                JSON.stringify(
+                    chartData,
+                    null,
+                    4
+                );
+
+
+            const blob =
+                new Blob(
+                    [json],
+                    {
+                        type:
+                            "application/json"
+                    }
+                );
+
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+            link.href = url;
+
+            link.download =
+                "my-chart.json";
+
+            link.click();
+
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        }
+    );
+
+
+    /*
+        ==============================
+        JSON 불러오기
+        ==============================
+    */
+
+    loadFile.addEventListener(
+        "change",
+        function(event) {
+
+            const file =
+                event.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function() {
+
+                    try {
+
+                        const data =
+                            JSON.parse(
+                                reader.result
+                            );
+
+
+                        notes =
+                            data.notes || [];
+
+
+                        if (
+                            data.duration
+                        ) {
+
+                            audioDuration =
+                                data.duration;
+
+                        }
+
+
+                        selectedNote =
+                            null;
+
+
+                        createTimeline();
+
+
+                        status.textContent =
+                            "채보를 불러왔습니다.";
+
+                    }
+                    catch (error) {
+
+                        alert(
+                            "JSON 파일을 읽을 수 없습니다."
+                        );
+
+                    }
+
+                };
+
+
+            reader.readAsText(
+                file
+            );
+
+        }
+    );
+
+
+    /*
+        ==============================
+        플레이 테스트
+        ==============================
+    */
+
+    testBtn.addEventListener(
+        "click",
+        function() {
+
+            isPlayingTest =
+                !isPlayingTest;
+
+
+            if (
+                isPlayingTest
+            ) {
+
+                gameArea.style.display =
+                    "block";
+
+                testBtn.textContent =
+                    "⏹ 테스트 종료";
+
+                startGame();
+
+            }
+            else {
+
+                gameArea.style.display =
+                    "none";
+
+                testBtn.textContent =
+                    "🎮 플레이 테스트";
+
+            }
+
+        }
+    );
+
+
+    /*
+        ==============================
+        게임 시작
+        ==============================
+    */
+
+    function startGame() {
+
+        gameArea
+            .querySelectorAll(
+                ".game-note"
+            )
+            .forEach(
+                note =>
+                    note.remove()
+            );
+
+
+        gameNotes =
+            notes.map(
+                note => ({
+
+                    ...note,
+
+                    element:
+                        null,
+
+                    hit:
+                        false
+
+                })
+            );
+
+
+        gameNotes.forEach(
+            function(note) {
+
+                const element =
+                    document.createElement(
+                        "div"
+                    );
+
+                element.className =
+                    "game-note";
+
+
+                element.style.left =
+                    (
+                        note.lane *
+                        20 +
+                        10
+                    ) + "%";
+
+
+                gameArea.appendChild(
+                    element
+                );
+
+
+                note.element =
+                    element;
+
+            }
+        );
+
+
+        requestAnimationFrame(
+            gameLoop
+        );
+
+    }
+
+
+    /*
+        ==============================
+        게임 루프
+        ==============================
+    */
+
+    function gameLoop() {
+
+        if (
+            !isPlayingTest
+        ) {
+            return;
+        }
+
+
+        const currentTime =
+            audio.currentTime;
+
+
+        gameNotes.forEach(
+            function(note) {
+
+                if (
+                    !note.element
+                ) {
+                    return;
+                }
+
+
+                /*
+                    현재 시간과 노트 시간 차이
+                */
+
+                const difference =
+                    note.time -
+                    currentTime;
+
+
+                /*
+                    노트가 내려오는 속도
+                */
+
+                const pixelsPerSecond =
+                    250;
+
+
+                /*
+                    판정선 위치
+                */
+
+                const hitLineY =
+                    520;
+
+
+                /*
+                    노트 위치
+                */
+
+                const y =
+                    hitLineY -
+                    difference *
+                    pixelsPerSecond;
+
+
+                note.element.style.top =
+                    y + "px";
+
+
+                /*
+                    너무 멀리 지나간 노트 숨기기
+                */
+
+                if (
+                    y > 650 ||
+                    y < -100
+                ) {
+
+                    note.element.style.display =
+                        "none";
+
+                }
+                else {
+
+                    note.element.style.display =
+                        "block";
+
+                }
+
+            }
+        );
+
+
+        requestAnimationFrame(
+            gameLoop
+        );
+
+    }
+
+
+    /*
+        ==============================
+        키보드 판정
+        ==============================
+    */
+
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                !isPlayingTest
+            ) {
+                return;
+            }
+
+
+            const keys = [
+                "d",
+                "f",
+                "j",
+                "k",
+                "l"
+            ];
+
+
+            const key =
+                event.key.toLowerCase();
+
+
+            const lane =
+                keys.indexOf(
+                    key
+                );
+
+
+            if (
+                lane === -1
+            ) {
+                return;
+            }
+
+
+            const currentTime =
+                audio.currentTime;
+
+
+            /*
+                판정 가능한 범위
+                ±0.2초
+            */
+
+            const judgementWindow =
+                0.2;
+
+
+            let closestNote =
+                null;
+
+            let closestDifference =
+                Infinity;
+
+
+            gameNotes.forEach(
+                function(note) {
+
+                    if (
+                        note.hit
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        note.lane !==
+                        lane
+                    ) {
+                        return;
+                    }
+
+
+                    const difference =
+                        Math.abs(
+                            note.time -
+                            currentTime
+                        );
+
+
+                    if (
+                        difference <
+                        closestDifference
+                    ) {
+
+                        closestNote =
+                            note;
+
+                        closestDifference =
+                            difference;
+
+                    }
+
+                }
+            );
+
+
+            if (
+                closestNote &&
+                closestDifference <=
+                judgementWindow
+            ) {
+
+                closestNote.hit =
+                    true;
+
+
+                closestNote.element.style.display =
+                    "none";
+
+
+                status.textContent =
+                    "✨ PERFECT!";
+
+            }
+            else {
+
+                status.textContent =
+                    "MISS";
+
+            }
+
+        }
+    );
+
+</script>
+
 </body>
 </html>
+```
