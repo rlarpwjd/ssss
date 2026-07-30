@@ -23,32 +23,22 @@ body{
 
 /* 화면에 보이는 창 */
 #editor-container{
-
     width:500px;
     height:700px;
-
     overflow-y:auto;
-
+    overflow-x:hidden;
     border:2px solid white;
-
 }
 
 
 /* 실제 채보 공간 */
 #editor{
-
-    width:500px;
-
+    width:100%;
     height:100000px;
-
     display:grid;
-
     grid-template-columns:repeat(20,1fr);
-
     background:#111;
-
     position:relative;
-
 }
 
 
