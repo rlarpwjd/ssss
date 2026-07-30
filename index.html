@@ -1,36 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>20Lane Chart Editor</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Chart Editor</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="topbar">
-
-<input type="number" id="bpm" value="120">
-
-<input type="file" id="music" accept="audio/*">
-
-<button id="play">▶</button>
-
-<button id="pause">⏸</button>
-
-<button id="clear">채보 초기화</button>
-
-<span id="time">0.000</span>
-
-</div>
-
-<div id="timeline"></div>
-
-<h3>미리보기</h3>
-
-<canvas id="preview" width="1000" height="500"></canvas>
+<div id="editor"></div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
