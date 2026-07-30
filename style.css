@@ -1,0 +1,36 @@
+body{
+    font-family:sans-serif;
+    background:#222;
+    color:white;
+}
+
+#topbar{
+    margin:10px;
+}
+
+#timeline{
+    width:1000px;
+    height:600px;
+    display:grid;
+    grid-template-columns:repeat(20,1fr);
+    border:2px solid white;
+    position:relative;
+    margin-top:20px;
+}
+
+.lane{
+    border-left:1px solid gray;
+    position:relative;
+}
+
+.note{
+    width:100%;
+    height:8px;
+    background:#00ffff;
+    position:absolute;
+}
+
+canvas{
+    background:black;
+    margin-top:20px;
+}
