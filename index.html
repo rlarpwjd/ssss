@@ -19,8 +19,6 @@ body{
     align-items:center;
     background:#202020;
 }
-
-
 /* 화면에 보이는 창 */
 #editor-container{
     width:500px;
@@ -29,8 +27,6 @@ body{
     overflow-x:hidden;
     border:2px solid white;
 }
-
-
 /* 실제 채보 공간 */
 #editor{
     width:100%;
@@ -40,66 +36,54 @@ body{
     background:#111;
     position:relative;
 }
-
-
 .lane{
-
     border-left:1px solid #555;
-
 }
-
-
 .lane:first-child{
-
     border-left:none;
-
 }
 
 
 /* 박자선 */
 .beat-line{
-
     position:absolute;
-
     left:0;
-
     width:100%;
-
     height:1px;
-
     background:white;
-
 }
 
 
 .measure-line{
-
     height:3px;
-
+}
+    .red-line{
+    position:absolute;
+    left:0;
+    width:100%;
+    height:2px;
+    background:#ff4040;
+    z-index:100;
+    pointer-events:none;
 }
 
+.blue-line{
+    position:absolute;
+    left:0;
+    width:100%;
+    height:2px;
+    background:#3aa0ff;
+    z-index:101;
+    pointer-events:none;
+}
 </style>
-
 </head>
-
-
 <body>
-
-
 <div id="editor-container">
-
     <div id="editor"></div>
-
 </div>
-
-
-
 <script>
-
-
 const editor=document.getElementById("editor");
-
-
 // 20레인 생성
 
 for(let i=0;i<20;i++){
@@ -134,6 +118,41 @@ for(let y=beatDistance;y<100000;y+=beatDistance){
 
 
 }
+
+    // 0초 기준선(Y 좌표)
+const ZERO_LINE_Y = 500;
+
+// 현재 재생 위치(초)
+let currentTime = 0;
+
+// 1초당 이동 거리(나중에 자유롭게 변경)
+const PIXELS_PER_SECOND = 100;
+
+
+// 파란선(0초 기준)
+const blueLine = document.createElement("div");
+blueLine.className = "blue-line";
+blueLine.style.top = ZERO_LINE_Y + "px";
+editor.appendChild(blueLine);
+
+
+// 빨간선(현재 재생 위치)
+const redLine = document.createElement("div");
+redLine.className = "red-line";
+editor.appendChild(redLine);
+
+
+// 현재 시간에 맞춰 빨간선 위치 계산
+function updateRedLine(){
+
+    const y = ZERO_LINE_Y - (currentTime * PIXELS_PER_SECOND);
+
+    redLine.style.top = y + "px";
+}
+
+
+// 초기 위치
+updateRedLine();
 
 
 </script>
