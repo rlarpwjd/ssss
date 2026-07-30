@@ -20,61 +20,103 @@ body{
     background:#202020;
 }
 
-#editor{
+
+/* 화면에 보이는 창 */
+#editor-container{
+
     width:500px;
     height:700px;
-    display:grid;
-    grid-template-columns:repeat(20,1fr);
+
+    overflow-y:auto;
+
     border:2px solid white;
-    background:#111;
-    position:relative;
+
 }
+
+
+/* 실제 채보 공간 */
+#editor{
+
+    width:500px;
+
+    height:100000px;
+
+    display:grid;
+
+    grid-template-columns:repeat(20,1fr);
+
+    background:#111;
+
+    position:relative;
+
+}
+
 
 .lane{
+
     border-left:1px solid #555;
+
 }
+
 
 .lane:first-child{
+
     border-left:none;
+
 }
 
 
-/* 박자 가로줄 */
+/* 박자선 */
 .beat-line{
+
     position:absolute;
+
     left:0;
+
     width:100%;
+
     height:1px;
+
     background:white;
-    z-index:5;
+
 }
 
 
-/* 마지막 박자 줄 */
 .measure-line{
+
     height:3px;
+
 }
 
 </style>
 
 </head>
 
+
 <body>
 
-<div id="editor"></div>
+
+<div id="editor-container">
+
+    <div id="editor"></div>
+
+</div>
+
 
 
 <script>
 
-const editor = document.getElementById("editor");
+
+const editor=document.getElementById("editor");
 
 
 // 20레인 생성
-for(let i = 0; i < 20; i++){
 
-    const lane = document.createElement("div");
+for(let i=0;i<20;i++){
 
-    lane.className = "lane";
+    const lane=document.createElement("div");
+
+    lane.className="lane";
 
     editor.appendChild(lane);
 
@@ -82,44 +124,30 @@ for(let i = 0; i < 20; i++){
 
 
 
-// 4/4 박자 가로줄 생성
-const editorHeight = 700;
+// 박자선 생성
+
+const beatDistance=50;
 
 
-// 한 박자의 간격
-// 4박 기준 한 마디 = 4줄
-const beatDistance = 50;
+for(let y=beatDistance;y<100000;y+=beatDistance){
 
 
+    const line=document.createElement("div");
 
-let beatCount = 0;
-
-
-for(let y = beatDistance; y < editorHeight; y += beatDistance){
-
-    const line = document.createElement("div");
-
-    line.className = "beat-line";
-
-    line.style.top = y + "px";
+    line.className="beat-line";
 
 
-    // 4번째 박자마다 굵은 줄
-    beatCount++;
-
-    if(beatCount % 4 === 0){
-
-        line.classList.add("measure-line");
-
-    }
+    line.style.top=y+"px";
 
 
     editor.appendChild(line);
+
 
 }
 
 
 </script>
+
 
 </body>
 </html>
