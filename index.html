@@ -101,6 +101,31 @@ button{
     background:red;
 }
 
+#note-panel{
+    width:100px;
+    height:700px;
+    background:#303030;
+    color:white;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* 선택된 노트 버튼 강조 */
+.note-type.selected{
+    background:yellow;
+    color:black;
+}
+
+/* 배치된 노트 */
+.note{
+    position:absolute;
+    height:10px;
+    background:orange;
+    border-radius:3px;
+}
+
 </style>
 </head>
 <body>
@@ -169,6 +194,22 @@ hidden
 <div id="start-line"></div>
 <div id="play-line"></div>
 </div>
+</div>
+
+<!-- 우측 노트 패널 -->
+<div id="note-panel">
+
+<div>노트 종류</div>
+
+<button class="note-type" data-note="a">A</button>
+<button class="note-type" data-note="b">B</button>
+<button class="note-type" data-note="c">C</button>
+<button class="note-type" data-note="d">D</button>
+<button class="note-type" data-note="e">E</button>
+<button class="note-type" data-note="f">F</button>
+<button class="note-type" data-note="g">G</button>
+<button class="note-type" data-note="h">H</button>
+
 </div>
 
 
@@ -339,6 +380,64 @@ function drawBeatLines(){
         count++;
     }
 }
+
+let selectedNote = null;   // 현재 선택된 노트 종류
+
+document
+.querySelectorAll(".note-type")
+.forEach(button=>{
+    button.onclick=()=>{
+
+        // 기존 선택 표시 다 지우고
+        document
+        .querySelectorAll(".note-type")
+        .forEach(b=>b.classList.remove("selected"));
+
+        // 지금 누른 버튼만 선택 표시
+        button.classList.add("selected");
+
+        selectedNote = button.dataset.note;
+
+    };
+});
+
+editor.addEventListener("click", e=>{
+
+    // 선택된 노트가 없으면 아무것도 안 함
+    if(!selectedNote) return;
+
+    // 클릭한 지점의 에디터 내부 좌표 계산
+    const rect = editor.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickYFromTop = e.clientY - rect.top;
+
+    // 흰 선/빨간 선처럼 bottom 기준 좌표로 변환
+    const clickYFromBottom = editor.offsetHeight - clickYFromTop;
+
+    // 가장 가까운 흰색 줄 위치로 스냅(딱 붙임)
+    const intervalSec = beatTime[division] / 1000;
+    const pxInterval = intervalSec * timeHeight;
+    const snappedY = Math.round(clickYFromBottom / pxInterval) * pxInterval;
+
+    // 클릭한 x좌표로 레인 번호 계산 (20레인 기준)
+    const laneWidth = editor.offsetWidth / 20;
+    const laneIndex = Math.floor(clickX / laneWidth);
+
+    // 노트 요소 생성
+    const note = document.createElement("div");
+    note.className = "note note-" + selectedNote;
+    note.style.bottom = snappedY + "px";
+    note.style.left = (laneIndex * laneWidth) + "px";
+    note.style.width = laneWidth + "px";
+
+    // 나중에 저장/불러오기할 때 쓸 데이터
+    note.dataset.note = selectedNote;
+    note.dataset.time = snappedY / timeHeight;
+    note.dataset.lane = laneIndex;
+
+    editor.appendChild(note);
+
+});
 </script>
 </body>
 </html>
