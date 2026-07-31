@@ -121,11 +121,11 @@ button{
 }
 
 /* 노트 종류별 색상 */
-.note-a{ background: #ff5555; }
-.note-b{ background: #ffb84d; }
-.note-c{ background: #ffe14d; }
-.note-d{ background: #7dff4d; }
-.note-e{ background: #4dffea; }
-.note-f{ background: #4d8bff; }
-.note-g{ background: #b34dff; }
-.note-h{ background: #ff4dc4; }
+.note-type[data-note="a"]{ background: #ff5555; }
+.note-type[data-note="b"]{ background: #ffb84d; }
+.note-type[data-note="c"]{ background: #ffe14d; }
+.note-type[data-note="d"]{ background: #7dff4d; }
+.note-type[data-note="e"]{ background: #4dffea; }
+.note-type[data-note="f"]{ background: #4d8bff; }
+.note-type[data-note="g"]{ background: #b34dff; }
+.note-type[data-note="h"]{ background: #ff4dc4; }
