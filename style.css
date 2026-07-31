@@ -114,6 +114,16 @@ button{
     /* background는 아래 종류별 클래스에서 지정 */
 }
 
+/* 배치된 노트 색상 */
+.note-a{ background: #ff5555; }
+.note-b{ background: #ffb84d; }
+.note-c{ background: #ffe14d; }
+.note-d{ background: #7dff4d; }
+.note-e{ background: #4dffea; }
+.note-f{ background: #4d8bff; }
+.note-g{ background: #b34dff; }
+.note-h{ background: #ff4dc4; }
+
 /* 노트 종류별 색상 */
 .note-type[data-note="a"]{ background: #ff5555; }
 .note-type[data-note="b"]{ background: #ffb84d; }
