@@ -106,12 +106,6 @@ button{
     gap:10px;
 }
 
-/* 선택된 노트 버튼 강조 */
-.note-type.selected{
-    background:yellow;
-    color:black;
-}
-
 /* 배치된 노트 */
 .note{
     position:absolute;
@@ -129,3 +123,9 @@ button{
 .note-type[data-note="f"]{ background: #4d8bff; }
 .note-type[data-note="g"]{ background: #b34dff; }
 .note-type[data-note="h"]{ background: #ff4dc4; }
+
+/* 선택된 노트 버튼 강조 */
+.note-type.selected{
+    background:yellow;
+    color:black;
+}
