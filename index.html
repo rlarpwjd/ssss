@@ -243,6 +243,7 @@ document
 .getElementById("play")
 .onclick=()=>{
     audio.play();
+    animateLine();
 };
 
 /*
@@ -279,12 +280,19 @@ document
         );
     };
 });
+
 /*
-음악 위치 → 빨간선 이동
+빨간선 부드럽게 이동시키는 함수
+재생 중일 때만 계속 실행됨
 */
-audio.ontimeupdate=()=>{
+function animateLine(){
     updateLine();
-};
+    if(!audio.paused){
+        requestAnimationFrame(animateLine);
+    }
+}
+
+
 function updateLine(){
     let time =
     audio.currentTime;
