@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Chart Editor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 좌측 패널 -->
+<div id="control-panel">
+
+<button id="load-music">
+노래 추가
+</button>
+
+<input 
+type="file"
+id="music-file"
+accept="audio/*"
+hidden
+>
+
+<button id="play">
+시작
+</button>
+
+<button id="pause">
+일시정지
+</button>
+
+<button id="reset">
+초기화
+</button>
+
+<hr>
+
+<div>
+박자 변경
+</div>
+
+<button class="division" data-value="4">
+1/4
+</button>
+
+<button class="division" data-value="8">
+1/8
+</button>
+
+<button class="division" data-value="16">
+1/16
+</button>
+
+<button class="division" data-value="32">
+1/32
+</button>
+
+<button class="division" data-value="64">
+1/64
+</button>
+
+<button class="division" data-value="128">
+1/128
+</button>
+
+</div>
+
+<!-- 에디터 -->
+<div id="editor-container">
+<div id="editor">
+<div id="start-line"></div>
+<div id="play-line"></div>
+</div>
+</div>
+
+<!-- 우측 노트 패널 -->
+<div id="note-panel">
+
+<div>노트 종류</div>
+
+<button class="note-type" data-note="a">A</button>
+<button class="note-type" data-note="b">B</button>
+<button class="note-type" data-note="c">C</button>
+<button class="note-type" data-note="d">D</button>
+<button class="note-type" data-note="e">E</button>
+<button class="note-type" data-note="f">F</button>
+<button class="note-type" data-note="g">G</button>
+<button class="note-type" data-note="h">H</button>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
