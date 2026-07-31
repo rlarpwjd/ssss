@@ -116,6 +116,16 @@ button{
 .note{
     position:absolute;
     height:10px;
-    background:orange;
     border-radius:3px;
+    /* background는 아래 종류별 클래스에서 지정 */
 }
+
+/* 노트 종류별 색상 */
+.note-a{ background: #ff5555; }
+.note-b{ background: #ffb84d; }
+.note-c{ background: #ffe14d; }
+.note-d{ background: #7dff4d; }
+.note-e{ background: #4dffea; }
+.note-f{ background: #4d8bff; }
+.note-g{ background: #b34dff; }
+.note-h{ background: #ff4dc4; }
