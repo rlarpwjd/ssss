@@ -1,0 +1,121 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#202020;
+}
+
+/* 좌측 조작 패널 */
+#control-panel{
+    width:180px;
+    height:700px;
+    background:#303030;
+    color:white;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* 버튼 */
+button{
+    padding:8px;
+    cursor:pointer;
+}
+
+/* 화면에 보이는 창 */
+#editor-container{
+    width:500px;
+    height:700px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    border:2px solid white;
+}
+
+/* 실제 채보 공간 */
+#editor{
+    width:100%;
+    height:100000px;
+    display:grid;
+    grid-template-columns:repeat(20,1fr);
+    background:#111;
+    position:relative;
+}
+
+/* 레인 */
+.lane{
+    border-left:1px solid #555;
+}
+
+.lane:first-child{
+    border-left:none;
+}
+
+/* 시간선 */
+.beat-line{
+    position:absolute;
+    left:0;
+    width:100%;
+    height:1px;
+    background:white;
+}
+
+/* 4의 배수 굵은 시간선 (beat-line 뒤에 위치해야 height가 정상 적용됨) */
+.beat-line-strong{
+    height:3px;
+    background:white;
+}
+
+/* 0초 기준 파란선 */
+#start-line{
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:3px;
+    background:blue;
+}
+
+/* 현재 재생 위치 빨간선 */
+#play-line{
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:3px;
+    background:red;
+}
+
+/* 우측 노트 패널 */
+#note-panel{
+    width:100px;
+    height:700px;
+    background:#303030;
+    color:white;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* 선택된 노트 버튼 강조 */
+.note-type.selected{
+    background:yellow;
+    color:black;
+}
+
+/* 배치된 노트 */
+.note{
+    position:absolute;
+    height:10px;
+    background:orange;
+    border-radius:3px;
+}
